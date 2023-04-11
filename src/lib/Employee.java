@@ -51,23 +51,27 @@ public class Employee {
 	 * Fungsi untuk menentukan gaji bulanan pegawai berdasarkan grade kepegawaiannya (grade 1: 3.000.000 per bulan, grade 2: 5.000.000 per bulan, grade 3: 7.000.000 per bulan)
 	 * Jika pegawai adalah warga negara asing gaji bulanan diperbesar sebanyak 50%
 	 */
-	
+
+
+	/**
+	 	Duplicate code pada fungsi setMonthlySalary(), yaitu jika Foreigner(WNA)
+	 	maka gaji diperbesar sebanyak 50% pada setiap grade.
+	 	Perubahan :
+	 		1. Menghapus kondisi if(isForeigner) pada setiap grade
+	 		2. Menambahkan kondisi if(isForeigner) pada setMonthlySalary()
+	 **/
 	public void setMonthlySalary(int grade) {	
 		if (grade == 1) {
 			monthlySalary = 3000000;
-			if (isForeigner) {
-				monthlySalary = (int) (3000000 * 1.5);
-			}
 		}else if (grade == 2) {
 			monthlySalary = 5000000;
-			if (isForeigner) {
-				monthlySalary = (int) (3000000 * 1.5);
-			}
 		}else if (grade == 3) {
 			monthlySalary = 7000000;
-			if (isForeigner) {
-				monthlySalary = (int) (3000000 * 1.5);
-			}
+		}
+
+		//kondisi ketika pegawai adalah warga negara asing
+		if (isForeigner) {
+			monthlySalary = (int) (3000000 * 1.5);
 		}
 	}
 	
@@ -88,18 +92,42 @@ public class Employee {
 		childNames.add(childName);
 		childIdNumbers.add(childIdNumber);
 	}
-	
-	public int getAnnualIncomeTax() {
-		
-		//Menghitung berapa lama pegawai bekerja dalam setahun ini, jika pegawai sudah bekerja dari tahun sebelumnya maka otomatis dianggap 12 bulan.
+
+	/**
+	 Long Method pada fungsi getAnnualIncomeTax(), yaitu terdapat banyak perhitungan pada fungsi ini.
+	 perhitungan tersebut dapat dibuatkan fungsi baru untuk mengurangi kompleksitas pada fungsi ini.
+	 Perubahan :
+	 	1. Membuat fungsi calculateWorkingMonth() untuk menghitung bulan bekerja pada tahun ini
+	 	2. Membuat fungsi isMarried() untuk mengecek apakah pegawai sudah menikah
+	 	3. Membuat fungsi getChildCount() untuk menghitung jumlah anak
+	 **/
+
+	//fungsi untuk menghitung bulan bekerja pada tahun ini
+	private int calculateWorkingMonth() {
 		LocalDate date = LocalDate.now();
-		
 		if (date.getYear() == yearJoined) {
-			monthWorkingInYear = date.getMonthValue() - monthJoined;
+			return date.getMonthValue() - monthJoined;
 		}else {
-			monthWorkingInYear = 12;
+			return 12;
 		}
-		
-		return TaxFunction.calculateTax(monthlySalary, otherMonthlyIncome, monthWorkingInYear, annualDeductible, spouseIdNumber.equals(""), childIdNumbers.size());
+	}
+
+	//fungsi untuk mengecek apakah pegawai sudah menikah
+	private boolean isMarried() {
+		// mereturn true jika sudah menikah, false jika belum menikah
+		return !spouseIdNumber.equals("");
+	}
+
+	private int getChildCount() {
+		// mereturn jumlah anak
+		return childIdNumbers.size();
+	}
+
+
+	//fungsi untuk menghitung pajak tahunan
+	public int getAnnualIncomeTax() {
+		int monthWorkingInYear = calculateWorkingMonth();
+		// mereturn pajak tahunan pegawai
+		return TaxFunction.calculateTax(monthlySalary, otherMonthlyIncome, monthWorkingInYear, annualDeductible, isMarried(), getChildCount());
 	}
 }
