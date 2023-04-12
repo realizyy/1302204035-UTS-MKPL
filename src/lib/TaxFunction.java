@@ -13,32 +13,51 @@ public class TaxFunction {
 	 * Jika pegawai sudah memiliki anak maka penghasilan tidak kena pajaknya ditambah sebesar Rp 4.500.000 per anak sampai anak ketiga.
 	 * 
 	 */
-	
-	
+
+
+	/**
+	 	Long Method pada fungssi calculateTax(), yaitu terdapat banyak perhitungan pada fungsi ini dan terlalu
+	 	banyak parameter yang harus diinputkan.
+	 	Perubahan :
+	 	1. Menambahkan variabel static untuk menampung nilai-nilai yang sering digunakan
+	 	2. Merubah fungsi calculateTax() menjadi lebih sederhana
+	 **/
+
+	private static final double TAX_RATE = 0.05;
+	private static final int MAX_MONTH_OF_WORKING = 12;
+	private static final int DEDUCTIBLE = 0;
+	private static final int NON_TAXABLE_INCOME_SINGLE = 54000000;
+	private static final int NON_TAXABLE_INCOME_MARRIED = 58500000;
+	private static final int NON_TAXABLE_INCOME_CHILD = 1500000;
+	private static final int MAX_CHILD = 3;
+
 	public static int calculateTax(int monthlySalary, int otherMonthlyIncome, int numberOfMonthWorking, int deductible, boolean isMarried, int numberOfChildren) {
-		
 		int tax = 0;
-		
-		if (numberOfMonthWorking > 12) {
-			System.err.println("More than 12 month working per year");
+
+		// mengecek apakah jumlah bulan bekerja lebih dari 12
+		if (numberOfMonthWorking > MAX_MONTH_OF_WORKING) {
+			System.err.println("Number of month working is more than 12");
 		}
-		
-		if (numberOfChildren > 3) {
-			numberOfChildren = 3;
+
+		// mengecek apakah jumlah anak lebih dari 3
+		if (numberOfChildren > MAX_CHILD) {
+			numberOfChildren = MAX_CHILD;
 		}
-		
-		if (isMarried) {
-			tax = (int) Math.round(0.05 * (((monthlySalary + otherMonthlyIncome) * numberOfMonthWorking) - deductible - (54000000 + 4500000 + (numberOfChildren * 1500000))));
-		}else {
-			tax = (int) Math.round(0.05 * (((monthlySalary + otherMonthlyIncome) * numberOfMonthWorking) - deductible - 54000000));
+
+		// menghitung pajak	pegawai
+		int nonTaxableIncome = isMarried ? NON_TAXABLE_INCOME_MARRIED : NON_TAXABLE_INCOME_SINGLE;
+
+		if (numberOfChildren > 0) {
+			nonTaxableIncome += numberOfChildren * NON_TAXABLE_INCOME_CHILD;
 		}
-		
+
+		tax = (int) Math.round(TAX_RATE * (((monthlySalary + otherMonthlyIncome) * numberOfMonthWorking) - deductible - nonTaxableIncome));
+
 		if (tax < 0) {
 			return 0;
-		}else {
+		} else {
 			return tax;
 		}
-			 
+
 	}
-	
 }
